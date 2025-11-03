@@ -990,19 +990,31 @@
                 return;
             }
 
+            if (typeof window.html2canvas !== 'function') {
+                alert('ไม่พบเครื่องมือสำหรับบันทึกหน้าจอ โปรดรีเฟรชแล้วลองใหม่อีกครั้ง');
+                return;
+            }
+
             const pdfElement = document.getElementById('screen-result');
 
             // Show loading state
             downloadPdfButton.innerHTML = `
-                <span class="inline-flex items-center gap-2">
+                <span class="inline-flex items-center gap-2" aria-hidden="true">
                     <span class="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>
                     กำลังสร้าง PDF...
                 </span>
             `;
+            downloadPdfButton.setAttribute('aria-busy', 'true');
             downloadPdfButton.disabled = true;
 
             try {
-                const canvas = await html2canvas(pdfElement, {
+                await waitForFontsToLoad();
+
+                const chartImageData = getChartImageData();
+
+                await new Promise(resolve => requestAnimationFrame(() => resolve()));
+
+                const canvas = await window.html2canvas(pdfElement, {
                     scale: 2, // Increase resolution
                     backgroundColor: '#ffffff',
                     useCORS: true,
@@ -1018,13 +1030,16 @@
                         }
 
                         const clonedCanvas = clonedDoc.getElementById('skillChart');
-                        if (clonedCanvas && chartInstance) {
-                            const dataUrl = chartInstance.toBase64Image ? chartInstance.toBase64Image() : chartInstance.canvas.toDataURL('image/png');
-                            const img = new Image();
-                            img.src = dataUrl;
-                            img.style.width = '100%';
-                            img.style.height = 'auto';
-                            clonedCanvas.parentNode.replaceChild(img, clonedCanvas);
+                        if (clonedCanvas) {
+                            if (chartImageData) {
+                                const img = clonedDoc.createElement('img');
+                                img.src = chartImageData;
+                                img.style.width = '100%';
+                                img.style.height = 'auto';
+                                clonedCanvas.replaceWith(img);
+                            } else {
+                                clonedCanvas.style.backgroundColor = '#ffffff';
+                            }
                         }
                     }
                 });
@@ -1055,8 +1070,39 @@
             } finally {
                 downloadPdfButton.innerHTML = pdfButtonDefaultHtml;
                 downloadPdfButton.disabled = false;
+                downloadPdfButton.removeAttribute('aria-busy');
             }
         });
+
+        async function waitForFontsToLoad() {
+            if (document.fonts && typeof document.fonts.ready === 'object') {
+                try {
+                    await document.fonts.ready;
+                } catch (error) {
+                    console.warn('ไม่สามารถตรวจสอบการโหลดฟอนต์ได้:', error);
+                }
+            }
+        }
+
+        function getChartImageData() {
+            if (!chartInstance) {
+                return null;
+            }
+
+            try {
+                if (typeof chartInstance.toBase64Image === 'function') {
+                    return chartInstance.toBase64Image('image/png', 1);
+                }
+
+                if (chartInstance.canvas && typeof chartInstance.canvas.toDataURL === 'function') {
+                    return chartInstance.canvas.toDataURL('image/png');
+                }
+            } catch (chartError) {
+                console.warn('ไม่สามารถแปลงกราฟเป็นภาพสำหรับ PDF ได้:', chartError);
+            }
+
+            return null;
+        }
 
     </script>
 </body>
