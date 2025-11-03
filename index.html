@@ -309,10 +309,10 @@
             <div class="w-full text-left space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <h3 class="text-2xl font-bold text-gray-800">สรุปผลการตอบ (Answer Review)</h3>
-                    <span class="inline-flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-4 py-2 rounded-full">
-                        <span class="text-base">📝</span>
-                        ขยายเพื่ออ่านเฉลยของทุกข้อ
-                    </span>
+                    <button id="expandAnswerReviewButton" type="button" class="inline-flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-4 py-2 rounded-full transition hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200" aria-expanded="false">
+                        <span class="text-base" aria-hidden="true">📝</span>
+                        <span class="expand-button-label">ขยายเพื่ออ่านเฉลยของทุกข้อ</span>
+                    </button>
                 </div>
                 <div id="answerReviewContainer" class="space-y-4 max-h-96 overflow-y-auto p-5 bg-white border border-blue-100 rounded-2xl shadow-inner">
                     <!-- ผลลัพธ์จะถูกสร้างโดย JavaScript -->
@@ -372,6 +372,9 @@
         const timeSpentDisplay = document.getElementById('timeSpent');
         const downloadPdfButton = document.getElementById('downloadPdfButton'); // (ใหม่)
         const pdfButtonDefaultHtml = downloadPdfButton.innerHTML;
+        const answerReviewContainer = document.getElementById('answerReviewContainer');
+        const expandAnswerReviewButton = document.getElementById('expandAnswerReviewButton');
+        const expandAnswerReviewButtonLabel = expandAnswerReviewButton ? expandAnswerReviewButton.querySelector('.expand-button-label') : null;
 
         // ===== Game State =====
         const totalDuration = 300; // 5 นาที
@@ -389,6 +392,7 @@
         };
         let chartInstance;
         let userResults = [];
+        let isAnswerReviewExpanded = false;
         let correctAnswers = 0;
         let incorrectAnswers = 0;
 
@@ -401,14 +405,6 @@
             doctor_ped: "👩‍⚕️"  // Woman Health Worker
         };
 
-        const skillLabels = {
-            reflecting: 'การสะท้อนความรู้สึก (Reflecting)',
-            questioning: 'การตั้งคำถาม (Questioning)',
-            handlingObjection: 'การจัดการข้อโต้แย้ง (Objection)',
-            handlingBias: 'การจัดการ Bias (Bias)',
-            crisisManagement: 'การคลี่คลายวิกฤต (Crisis)'
-        };
-        
         // ===== คลังสถานการณ์ (ดึงจากเนื้อหาอบรม) =====
         const questions = [
             // (ทักษะละ 4 ข้อ = 20 ข้อ)
@@ -705,6 +701,39 @@
             accuracyDisplay.textContent = `${accuracy}%`;
         }
 
+        function setAnswerReviewExpanded(expanded) {
+            if (!answerReviewContainer) return;
+
+            isAnswerReviewExpanded = expanded;
+
+            if (expanded) {
+                answerReviewContainer.classList.remove('max-h-96', 'overflow-y-auto');
+                answerReviewContainer.style.maxHeight = 'none';
+                answerReviewContainer.style.overflowY = 'visible';
+                if (expandAnswerReviewButton) {
+                    expandAnswerReviewButton.setAttribute('aria-expanded', 'true');
+                }
+                if (expandAnswerReviewButtonLabel) {
+                    expandAnswerReviewButtonLabel.textContent = 'ย่อเฉลยกลับ';
+                }
+            } else {
+                answerReviewContainer.classList.add('max-h-96', 'overflow-y-auto');
+                answerReviewContainer.style.maxHeight = '';
+                answerReviewContainer.style.overflowY = '';
+                answerReviewContainer.scrollTop = 0;
+                if (expandAnswerReviewButton) {
+                    expandAnswerReviewButton.setAttribute('aria-expanded', 'false');
+                }
+                if (expandAnswerReviewButtonLabel) {
+                    expandAnswerReviewButtonLabel.textContent = 'ขยายเพื่ออ่านเฉลยของทุกข้อ';
+                }
+            }
+        }
+
+        function toggleAnswerReviewExpansion() {
+            setAnswerReviewExpanded(!isAnswerReviewExpanded);
+        }
+
         // โหลดคำถาม
         function loadQuestion() {
             updateProgress();
@@ -731,10 +760,7 @@
                     <span class="answer-overlay absolute inset-0 bg-gradient-to-r from-blue-50/0 to-cyan-50/0 transition-opacity duration-300"></span>
                     <div class="relative flex items-start gap-4 p-5">
                         <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-cyan-100 text-blue-600 font-semibold flex items-center justify-center">${index + 1}</div>
-                        <div class="space-y-2">
-                            <p class="font-semibold text-gray-800 leading-relaxed group-hover:text-blue-600">${option.text}</p>
-                            <p class="answer-skill text-xs uppercase tracking-wide text-blue-400 font-semibold">${skillLabels[option.skill]}</p>
-                        </div>
+                        <p class="relative z-[1] font-semibold text-gray-800 leading-relaxed group-hover:text-blue-600">${option.text}</p>
                     </div>
                 `;
 
@@ -846,8 +872,10 @@
 
         // --- ฟังก์ชันใหม่: แสดงเฉลย ---
         function renderAnswerReview() {
-            const reviewContainer = document.getElementById('answerReviewContainer');
-            reviewContainer.innerHTML = ""; // ล้างของเก่า
+            if (!answerReviewContainer) return;
+
+            answerReviewContainer.innerHTML = ""; // ล้างของเก่า
+            setAnswerReviewExpanded(false);
 
             userResults.forEach((result, index) => {
                 const statusIcon = result.isCorrect ? '✅' : '❌';
@@ -872,11 +900,10 @@
                                     <strong>เฉลยที่เหมาะสม:</strong> “${result.correctAnswer}”
                                 </p>
                             ` : ''}
-                            <p class="text-xs uppercase tracking-wide text-blue-400 font-semibold">ทักษะที่ประเมิน: ${skillLabels[result.skillKey]}</p>
                         </div>
                     </div>
                 `;
-                reviewContainer.innerHTML += resultHtml;
+                answerReviewContainer.innerHTML += resultHtml;
             });
         }
         // --- จบฟังก์ชันใหม่ ---
@@ -962,6 +989,12 @@
         }
 
         // ===== Event Listeners =====
+        if (expandAnswerReviewButton) {
+            expandAnswerReviewButton.addEventListener('click', () => {
+                toggleAnswerReviewExpansion();
+            });
+        }
+
         startButton.addEventListener('click', startGame);
         
         restartButton.addEventListener('click', () => {
@@ -969,7 +1002,10 @@
             if (chartInstance) {
                 chartInstance.destroy();
             }
-            document.getElementById('answerReviewContainer').innerHTML = ""; // <--- ล้างเฉลย
+            if (answerReviewContainer) {
+                answerReviewContainer.innerHTML = ""; // <--- ล้างเฉลย
+            }
+            setAnswerReviewExpanded(false);
             screenResult.classList.add('hidden');
             screenStart.classList.remove('hidden');
             playerNameInput.value = ""; // ล้างชื่อ
