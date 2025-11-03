@@ -94,6 +94,11 @@
             scrollbar-color: #3b82f6 #e0f2fe;
             scrollbar-width: thin;
         }
+
+        #expandAnswerReviewButton.is-expanded {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: #1d4ed8;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-cyan-100 min-h-screen flex items-center justify-center p-4">
@@ -309,7 +314,7 @@
             <div class="w-full text-left space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <h3 class="text-2xl font-bold text-gray-800">สรุปผลการตอบ (Answer Review)</h3>
-                    <button id="expandAnswerReviewButton" type="button" class="inline-flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-4 py-2 rounded-full transition hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200" aria-expanded="false">
+                    <button id="expandAnswerReviewButton" type="button" class="inline-flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-4 py-2 rounded-full transition hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200" aria-expanded="false" aria-controls="answerReviewContainer">
                         <span class="text-base" aria-hidden="true">📝</span>
                         <span class="expand-button-label">ขยายเพื่ออ่านเฉลยของทุกข้อ</span>
                     </button>
@@ -711,6 +716,7 @@
                 answerReviewContainer.style.maxHeight = 'none';
                 answerReviewContainer.style.overflowY = 'visible';
                 if (expandAnswerReviewButton) {
+                    expandAnswerReviewButton.classList.add('is-expanded');
                     expandAnswerReviewButton.setAttribute('aria-expanded', 'true');
                 }
                 if (expandAnswerReviewButtonLabel) {
@@ -722,6 +728,7 @@
                 answerReviewContainer.style.overflowY = '';
                 answerReviewContainer.scrollTop = 0;
                 if (expandAnswerReviewButton) {
+                    expandAnswerReviewButton.classList.remove('is-expanded');
                     expandAnswerReviewButton.setAttribute('aria-expanded', 'false');
                 }
                 if (expandAnswerReviewButtonLabel) {
