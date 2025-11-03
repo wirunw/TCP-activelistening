@@ -20,11 +20,45 @@
         body {
             font-family: 'Sarabun', 'Inter', sans-serif;
             background-color: #f8fafc; /* Tailwind bg-slate-50 */
+            position: relative;
+            overflow-x: hidden;
         }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            width: 440px;
+            height: 440px;
+            border-radius: 9999px;
+            filter: blur(160px);
+            opacity: 0.55;
+            z-index: -1;
+        }
+
+        body::before {
+            top: -120px;
+            left: -120px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(14, 116, 144, 0.25));
+        }
+
+        body::after {
+            bottom: -160px;
+            right: -140px;
+            background: linear-gradient(135deg, rgba(165, 180, 252, 0.35), rgba(59, 130, 246, 0.25));
+        }
+
         /* ซ่อนหน้าจอเริ่มต้น */
         .hidden {
             display: none;
         }
+
+        /* Glass morphism helper */
+        .glass-card {
+            backdrop-filter: blur(16px);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(236, 248, 255, 0.88));
+        }
+
         /* Animation สำหรับการตอบถูก/ผิด */
         @keyframes flash-green {
             from { background-color: #d1fae5; border-color: #10b981; }
@@ -40,6 +74,26 @@
         .feedback-incorrect {
             animation: flash-red 0.5s ease-out;
         }
+
+        /* Scrollbar styling for the answer review */
+        #answerReviewContainer::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #answerReviewContainer::-webkit-scrollbar-track {
+            background: #e0f2fe;
+            border-radius: 9999px;
+        }
+
+        #answerReviewContainer::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #3b82f6, #0ea5e9);
+            border-radius: 9999px;
+        }
+
+        #answerReviewContainer {
+            scrollbar-color: #3b82f6 #e0f2fe;
+            scrollbar-width: thin;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-cyan-100 min-h-screen flex items-center justify-center p-4">
@@ -47,32 +101,86 @@
     <div class="w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-500">
 
         <!-- ===== 1. หน้าจอเริ่มต้น (Start Screen) ===== -->
-        <div id="screen-start" class="p-8 md:p-12 text-center">
-            <img src="https://placehold.co/150x150/0284C7/FFFFFF?text=T.C.P.&font=inter" alt="TCP Logo" class="w-32 h-32 rounded-full mx-auto mb-6 border-4 border-white shadow-lg">
-            <h1 class="text-3xl md:text-4xl font-bold text-blue-800 mb-2">T.C.P. Advisor Hub</h1>
-            <p class="text-lg text-gray-600 mb-8">เครื่องจำลองทักษะ Active Listening</p>
-            <p class="text-gray-700 mb-6">คุณมีเวลา <strong class="text-red-600">5 นาที</strong> ในการเผชิญ <strong class="text-blue-600">20 สถานการณ์</strong>จริงกับลูกค้า<br>ตั้งสติ, ฟังให้ลึก, และเลือกคำตอบที่ดีที่สุด!</p>
-            
+        <div id="screen-start" class="relative p-8 md:p-12 text-center space-y-8">
+            <div class="absolute inset-0 pointer-events-none">
+                <div class="absolute -top-10 -left-6 w-40 h-40 bg-blue-100 rounded-full blur-3xl opacity-70"></div>
+                <div class="absolute -bottom-10 -right-10 w-48 h-48 bg-cyan-100 rounded-full blur-3xl opacity-70"></div>
+            </div>
+
+            <div class="relative flex flex-col items-center gap-6">
+                <div class="relative">
+                    <span class="absolute -top-3 -right-3 bg-amber-400 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">เวอร์ชันอัปเดต</span>
+                    <img src="https://placehold.co/150x150/0284C7/FFFFFF?text=T.C.P.&font=inter" alt="TCP Logo" class="w-32 h-32 rounded-full mx-auto border-4 border-white shadow-xl">
+                </div>
+                <div class="space-y-3">
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-blue-900 tracking-tight">T.C.P. Advisor Hub</h1>
+                    <p class="text-lg md:text-xl text-gray-600">เครื่องจำลองทักษะ Active Listening ที่ออกแบบเพื่อที่ปรึกษามืออาชีพ</p>
+                    <p class="text-base text-gray-700">
+                        คุณมีเวลา <strong class="text-red-500">5 นาที</strong> ในการเผชิญหน้า <strong class="text-blue-600">20 สถานการณ์จริง</strong> กับลูกค้า<br>
+                        ตั้งสติ ฟังอย่างลึกซึ้ง และเลือกคำตอบที่ทรงพลังที่สุด!
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+                <div class="glass-card rounded-2xl shadow-md p-5 border border-blue-100">
+                    <div class="text-3xl">🎯</div>
+                    <h3 class="text-lg font-semibold text-gray-800 mt-2">20 กรณีสถานการณ์จริง</h3>
+                    <p class="text-sm text-gray-600 mt-1">คัดสรรจากบทสนทนาที่เกิดขึ้นจริง พร้อมวัดทักษะแต่ละด้านอย่างแม่นยำ</p>
+                </div>
+                <div class="glass-card rounded-2xl shadow-md p-5 border border-blue-100">
+                    <div class="text-3xl">🧠</div>
+                    <h3 class="text-lg font-semibold text-gray-800 mt-2">วัด 5 ทักษะสำคัญ</h3>
+                    <p class="text-sm text-gray-600 mt-1">Reflecting, Questioning, Objection, Bias และ Crisis Management</p>
+                </div>
+                <div class="glass-card rounded-2xl shadow-md p-5 border border-blue-100">
+                    <div class="text-3xl">📄</div>
+                    <h3 class="text-lg font-semibold text-gray-800 mt-2">รายงานผลสวยงาม</h3>
+                    <p class="text-sm text-gray-600 mt-1">บันทึกคะแนน กราฟทักษะ และเฉลย พร้อมดาวน์โหลดเป็นไฟล์ PDF ได้ทันที</p>
+                </div>
+            </div>
+
             <!-- กติกาการให้คะแนน (ใหม่) -->
-            <div class="w-full max-w-sm mx-auto bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 text-left text-sm text-gray-700">
-                <h4 class="font-bold text-center text-gray-800 mb-2">กติกาการให้คะแนน</h4>
-                <ul class="list-none space-y-1">
-                    <li><span class="text-green-600 font-bold">✔ ตอบถูก:</span> +10 คะแนน (และ +1คะแนนทักษะ)</li>
-                    <li><span class="text-red-600 font-bold">✖ ตอบผิด:</span> -5 คะแนน</li>
-                    <li><span class="text-blue-600 font-bold">⏱ เวลาหมด:</span> สรุปคะแนนทันที</li>
-                </ul>
+            <div class="w-full glass-card border border-blue-100 rounded-2xl p-6 mx-auto text-left text-sm text-gray-700 shadow-lg">
+                <h4 class="font-bold text-gray-800 text-lg text-center">กติกาการให้คะแนน</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">✔</span>
+                        <div>
+                            <p class="font-semibold text-green-600">ตอบถูก</p>
+                            <p class="text-gray-600">+10 คะแนน และ +1 คะแนนทักษะ</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">✖</span>
+                        <div>
+                            <p class="font-semibold text-red-500">ตอบผิด</p>
+                            <p class="text-gray-600">-5 คะแนน</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">⏱</span>
+                        <div>
+                            <p class="font-semibold text-blue-600">เวลาหมด</p>
+                            <p class="text-gray-600">ระบบจะสรุปผลทันที</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="mb-6">
-                <label for="playerName" class="block text-sm font-medium text-gray-700 mb-2">กรุณาใส่ชื่อของคุณ:</label>
-                <input type="text" id="playerName" class="w-full max-w-sm mx-auto px-4 py-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="ชื่อ-นามสกุล">
+
+            <div class="mx-auto space-y-4 max-w-xl">
+                <div class="text-left">
+                    <label for="playerName" class="block text-sm font-semibold text-gray-700 mb-2">กรุณาใส่ชื่อของคุณ</label>
+                    <input type="text" id="playerName" class="w-full px-4 py-3 rounded-xl border-2 border-white shadow-inner focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition" placeholder="ชื่อ-นามสกุล">
+                </div>
+                <button id="startButton" class="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 text-white font-semibold py-4 px-6 rounded-xl shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-300">
+                    <span>เริ่มจำลองสถานการณ์</span>
+                    <span class="text-lg">🚀</span>
+                </button>
             </div>
-            <button id="startButton" class="w-full max-w-sm mx-auto bg-blue-600 text-white font-bold py-4 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105">
-                เริ่มจำลองสถานการณ์!
-            </button>
-            
+
             <!-- Credit Footer (ใหม่) -->
-            <p class="text-xs text-gray-400 mt-12 text-center">
+            <p class="text-xs text-gray-400 pt-6 border-t border-gray-100">
                 ออกแบบโดย เภสัชกรวิรุณ เวชศิริ | <a href="https://www.pharmconnection.net" target="_blank" class="text-blue-500 hover:underline">www.pharmconnection.net</a>
             </p>
         </div>
@@ -80,82 +188,143 @@
         <!-- ===== 2. หน้าจอเล่นเกม (Game Screen) ===== -->
         <div id="screen-game" class="hidden">
             <!-- ส่วนหัว: เวลาและคะแนน -->
-            <div class="flex justify-between items-center p-6 bg-gray-50 border-b border-gray-200">
-                <div>
-                    <span class="text-sm text-gray-500">เวลาที่เหลือ</span>
-                    <div id="timer" class="text-3xl font-bold text-red-600">05:00</div>
+            <div class="bg-gradient-to-br from-blue-50 via-white to-cyan-50 border-b border-blue-100 p-6 md:p-8">
+                <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-2xl shadow-inner">🎧</div>
+                        <div class="text-left">
+                            <p class="text-xs font-semibold uppercase tracking-wide text-blue-500">ผู้เล่น</p>
+                            <p id="activePlayerName" class="text-lg font-semibold text-gray-900">ผู้แทน</p>
+                            <p class="text-sm text-gray-500">สถานการณ์ที่ <span id="questionCounter" class="font-semibold text-blue-600">1 / 20</span></p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-6 md:justify-end">
+                        <div class="text-right">
+                            <span class="text-sm text-gray-500 block">เวลาที่เหลือ</span>
+                            <div id="timer" class="text-3xl md:text-4xl font-black text-rose-500 tracking-tight">05:00</div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-sm text-gray-500 block">คะแนนสะสม</span>
+                            <div id="score" class="text-3xl md:text-4xl font-black text-emerald-500 tracking-tight">0</div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <span class="text-sm text-gray-500 text-right">คะแนนสะสม</span>
-                    <div id="score" class="text-3xl font-bold text-green-600">0</div>
+
+                <div class="mt-6">
+                    <div class="w-full h-2.5 bg-white/70 rounded-full overflow-hidden shadow-inner">
+                        <div id="progressBar" class="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-400 rounded-full transition-all duration-500" style="width: 0%;"></div>
+                    </div>
+                    <div class="flex justify-between text-xs text-blue-900 font-semibold mt-2 uppercase tracking-wide">
+                        <span>เริ่มต้น</span>
+                        <span id="totalQuestionsLabel">20 สถานการณ์</span>
+                    </div>
                 </div>
             </div>
 
             <!-- ส่วนสถานการณ์ -->
-            <div id="scenario" class="p-6 md:p-8">
-                <div class="text-center mb-6">
+            <div id="scenario" class="p-6 md:p-8 space-y-6">
+                <div class="text-center space-y-4">
                     <!-- ใช้ Emoji แทนรูปภาพ (ใหม่) -->
-                    <div id="customerEmoji" class="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-white shadow-lg flex items-center justify-center bg-gray-100" style="font-size: 5rem; line-height: 1;">
+                    <div id="customerEmoji" class="w-32 h-32 rounded-full mx-auto border-4 border-white shadow-xl flex items-center justify-center bg-blue-50" style="font-size: 5rem; line-height: 1;">
                         🧑‍⚕️
                     </div>
-                    <h2 id="customerName" class="text-2xl font-bold text-gray-800">เภสัชกร (ร้านยา Chain)</h2>
+                    <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold">
+                        <span class="text-lg">💬</span>
+                        <h2 id="customerName" class="text-base md:text-lg font-semibold">เภสัชกร (ร้านยา Chain)</h2>
+                    </div>
                 </div>
-                <div class="bg-gray-100 rounded-lg p-6 mb-6 min-h-[100px] flex items-center justify-center border border-gray-200">
-                    <p id="dialogue" class="text-lg text-center font-medium text-gray-900">
+                <div class="glass-card rounded-2xl p-6 md:p-8 min-h-[120px] flex items-center justify-center border border-blue-100 shadow-lg">
+                    <p id="dialogue" class="text-lg md:text-xl text-center font-semibold text-gray-800 leading-relaxed">
                         "ใช้ ไซริงค์ (Syringe) ธรรมดาก็ล้างได้เหมือนกัน ราคาถูกกว่า Hashi Plus ตั้งเยอะ"
                     </p>
                 </div>
 
                 <!-- ส่วนตัวเลือกคำตอบ -->
-                <div id="options" class="space-y-3">
+                <div id="options" class="space-y-4">
                     <!-- ตัวเลือกจะถูกสร้างโดย JavaScript -->
                 </div>
             </div>
-            
+
             <!-- Credit Footer (ใหม่) -->
-            <p class="text-xs text-gray-400 p-4 text-center bg-gray-50 border-t border-gray-200">
+            <p class="text-xs text-gray-400 p-4 text-center bg-white/80 border-t border-blue-100">
                 ออกแบบโดย เภสัชกรวิรุณ เวชศิริ | <a href="https://www.pharmconnection.net" target="_blank" class="text-blue-500 hover:underline">www.pharmconnection.net</a>
             </p>
         </div>
 
         <!-- ===== 3. หน้าจอผลลัพธ์ (Result Screen) ===== -->
-        <div id="screen-result" class="hidden p-8 md:p-12 text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-blue-800 mb-4">สรุปผลลัพธ์</h1>
-            <p class="text-xl text-gray-700 mb-6">คุณ <strong id="resultPlayerName" class="text-blue-600"></strong></p>
-            
-            <div class="bg-gray-50 rounded-xl p-6 mb-6 shadow-inner border border-gray-200">
-                <span class="text-sm text-gray-500">คะแนนรวมของคุณ</span>
-                <div id="finalScore" class="text-6xl font-bold text-green-600">0</div>
+        <div id="screen-result" class="hidden p-8 md:p-12 text-center space-y-8">
+            <div class="space-y-2">
+                <h1 class="text-3xl md:text-4xl font-extrabold text-blue-900">สรุปผลลัพธ์</h1>
+                <p class="text-xl text-gray-700">คุณ <strong id="resultPlayerName" class="text-blue-600"></strong></p>
             </div>
 
-            <p id="feedbackMessage" class="text-lg font-medium text-gray-800 mb-8">ยอดเยี่ยมมาก! คุณคือที่ปรึกษาที่แท้จริง!</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card rounded-2xl p-6 border border-blue-100 shadow-lg">
+                    <span class="text-sm text-gray-500 uppercase tracking-wide">คะแนนรวมของคุณ</span>
+                    <div id="finalScore" class="text-5xl md:text-6xl font-black text-emerald-500 tracking-tight mt-2">0</div>
+                </div>
+                <div class="glass-card rounded-2xl p-6 border border-blue-100 shadow-lg flex flex-col justify-center">
+                    <p id="feedbackMessage" class="text-lg md:text-xl font-semibold text-gray-800">ยอดเยี่ยมมาก! คุณคือที่ปรึกษาที่แท้จริง!</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white rounded-2xl border border-blue-100 p-4 shadow-sm">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">ตอบถูก</p>
+                    <p id="correctCount" class="text-3xl font-bold text-emerald-500 mt-1">0</p>
+                </div>
+                <div class="bg-white rounded-2xl border border-blue-100 p-4 shadow-sm">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">ตอบผิด</p>
+                    <p id="incorrectCount" class="text-3xl font-bold text-rose-500 mt-1">0</p>
+                </div>
+                <div class="bg-white rounded-2xl border border-blue-100 p-4 shadow-sm">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">ความแม่นยำ</p>
+                    <p id="accuracyRate" class="text-3xl font-bold text-blue-600 mt-1">0%</p>
+                </div>
+                <div class="bg-white rounded-2xl border border-blue-100 p-4 shadow-sm">
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">เวลาที่ใช้</p>
+                    <p id="timeSpent" class="text-3xl font-bold text-indigo-500 mt-1">00:00</p>
+                </div>
+            </div>
 
             <!-- กราฟใยแมงมุม -->
-            <div class="w-full max-w-md mx-auto mb-8">
-                <canvas id="skillChart"></canvas>
+            <div class="w-full max-w-lg mx-auto">
+                <div class="glass-card rounded-3xl border border-blue-100 p-6 shadow-xl">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">พัฒนาการทักษะทั้ง 5 ด้าน</h3>
+                    <canvas id="skillChart"></canvas>
+                </div>
             </div>
 
             <!-- ===== ส่วนเฉลยคำตอบ (ใหม่) ===== -->
-            <div class="w-full text-left mt-10">
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">สรุปผลการตอบ (Answer Review)</h3>
-                <div id="answerReviewContainer" class="space-y-4 max-h-96 overflow-y-auto p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <div class="w-full text-left space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <h3 class="text-2xl font-bold text-gray-800">สรุปผลการตอบ (Answer Review)</h3>
+                    <span class="inline-flex items-center gap-2 text-sm text-blue-600 bg-blue-50 px-4 py-2 rounded-full">
+                        <span class="text-base">📝</span>
+                        ขยายเพื่ออ่านเฉลยของทุกข้อ
+                    </span>
+                </div>
+                <div id="answerReviewContainer" class="space-y-4 max-h-96 overflow-y-auto p-5 bg-white border border-blue-100 rounded-2xl shadow-inner">
                     <!-- ผลลัพธ์จะถูกสร้างโดย JavaScript -->
                 </div>
             </div>
             <!-- ===== จบส่วนเฉลยคำตอบ ===== -->
 
-            <button id="restartButton" class="w-full max-w-sm mx-auto bg-blue-600 text-white font-bold py-4 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 mt-10">
-                ลองอีกครั้ง
-            </button>
-            
-            <!-- (ใหม่) Download PDF Button -->
-            <button id="downloadPdfButton" class="w-full max-w-sm mx-auto bg-gray-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 mt-4">
-                ดาวน์โหลดผลลัพธ์ (PDF)
-            </button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 pt-4">
+                <button id="restartButton" class="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-xl hover:shadow-2xl transition-transform duration-300 hover:scale-[1.01]">
+                    <span>ลองอีกครั้ง</span>
+                    <span>🔄</span>
+                </button>
 
+                <!-- (ใหม่) Download PDF Button -->
+                <button id="downloadPdfButton" class="w-full inline-flex items-center justify-center gap-2 bg-slate-900 text-white font-semibold py-4 px-6 rounded-2xl shadow-xl hover:bg-slate-800 transition-transform duration-300 hover:scale-[1.01]">
+                    <span>ดาวน์โหลดผลลัพธ์ (PDF)</span>
+                    <span>⬇️</span>
+                </button>
+            </div>
 
             <!-- Credit Footer (ใหม่) -->
-            <p class="text-xs text-gray-400 mt-12 text-center">
+            <p class="text-xs text-gray-400 pt-6 border-t border-gray-100">
                 ออกแบบโดย เภสัชกรวิรุณ เวชศิริ | <a href="https://www.pharmconnection.net" target="_blank" class="text-blue-500 hover:underline">www.pharmconnection.net</a>
             </p>
         </div>
@@ -174,6 +343,10 @@
 
         const timerDisplay = document.getElementById('timer');
         const scoreDisplay = document.getElementById('score');
+        const activePlayerName = document.getElementById('activePlayerName');
+        const questionCounter = document.getElementById('questionCounter');
+        const totalQuestionsLabel = document.getElementById('totalQuestionsLabel');
+        const progressBar = document.getElementById('progressBar');
         const customerEmoji = document.getElementById('customerEmoji'); // <--- เปลี่ยนจาก customerImage
         const customerName = document.getElementById('customerName');
         const dialogue = document.getElementById('dialogue');
@@ -183,10 +356,16 @@
         const finalScoreDisplay = document.getElementById('finalScore');
         const feedbackMessage = document.getElementById('feedbackMessage');
         const skillChartCanvas = document.getElementById('skillChart');
+        const correctCountDisplay = document.getElementById('correctCount');
+        const incorrectCountDisplay = document.getElementById('incorrectCount');
+        const accuracyDisplay = document.getElementById('accuracyRate');
+        const timeSpentDisplay = document.getElementById('timeSpent');
         const downloadPdfButton = document.getElementById('downloadPdfButton'); // (ใหม่)
+        const pdfButtonDefaultHtml = downloadPdfButton.innerHTML;
 
         // ===== Game State =====
-        let timer = 300; // 5 นาที
+        const totalDuration = 300; // 5 นาที
+        let timer = totalDuration;
         let timerInterval;
         let score = 0;
         let currentPlayer = "ผู้แทน";
@@ -199,7 +378,9 @@
             crisisManagement: 0,
         };
         let chartInstance;
-        let userResults = []; 
+        let userResults = [];
+        let correctAnswers = 0;
+        let incorrectAnswers = 0;
 
         // ===== รูปภาพลูกค้า (เปลี่ยนเป็น Emojis) =====
         const customerEmojis = {
@@ -208,6 +389,14 @@
             parent: "👩‍👦", // Woman and Boy
             doctor_angry: "👨‍⚕️", // Man Health Worker (let dialogue show anger)
             doctor_ped: "👩‍⚕️"  // Woman Health Worker
+        };
+
+        const skillLabels = {
+            reflecting: 'การสะท้อนความรู้สึก (Reflecting)',
+            questioning: 'การตั้งคำถาม (Questioning)',
+            handlingObjection: 'การจัดการข้อโต้แย้ง (Objection)',
+            handlingBias: 'การจัดการ Bias (Bias)',
+            crisisManagement: 'การคลี่คลายวิกฤต (Crisis)'
         };
         
         // ===== คลังสถานการณ์ (ดึงจากเนื้อหาอบรม) =====
@@ -420,6 +609,9 @@
             }
         ];
 
+        const totalQuestions = questions.length;
+        totalQuestionsLabel.textContent = `${totalQuestions} สถานการณ์`;
+
         // ===== Game Functions =====
 
         // เริ่มเกม
@@ -432,13 +624,28 @@
 
             // Reset ค่า
             score = 0;
-            timer = 300; // 5 นาที
+            timer = totalDuration;
             currentQuestionIndex = 0;
-            userResults = []; // <--- รีเซ็ตผลลัพธ์
+            userResults = [];
+            correctAnswers = 0;
+            incorrectAnswers = 0;
             skillScores = { reflecting: 0, questioning: 0, handlingObjection: 0, handlingBias: 0, crisisManagement: 0 };
+
+            // Reset UI
             scoreDisplay.textContent = score;
-            timerDisplay.textContent = "05:00";
-            
+            timerDisplay.textContent = formatTime(timer);
+            activePlayerName.textContent = currentPlayer;
+            correctCountDisplay.textContent = '0';
+            incorrectCountDisplay.textContent = '0';
+            accuracyDisplay.textContent = '0%';
+            timeSpentDisplay.textContent = '00:00';
+            downloadPdfButton.disabled = false;
+            downloadPdfButton.innerHTML = pdfButtonDefaultHtml;
+            restartButton.style.display = '';
+            downloadPdfButton.style.display = '';
+
+            updateProgress();
+
             // สลับหน้าจอ
             screenStart.classList.add('hidden');
             screenResult.classList.add('hidden');
@@ -457,18 +664,41 @@
             }
             timerInterval = setInterval(() => {
                 timer--;
-                const minutes = Math.floor(timer / 60);
-                const seconds = timer % 60;
-                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                timerDisplay.textContent = formatTime(timer);
 
                 if (timer <= 0) {
+                    timer = 0;
                     endGame();
                 }
             }, 1000);
         }
 
+        function updateProgress() {
+            const answeredCount = Math.min(currentQuestionIndex, totalQuestions);
+            const displayIndex = currentQuestionIndex < totalQuestions ? currentQuestionIndex + 1 : totalQuestions;
+            questionCounter.textContent = `${displayIndex} / ${totalQuestions}`;
+            const progressPercentage = totalQuestions === 0 ? 0 : (answeredCount / totalQuestions) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+
+        function formatTime(seconds) {
+            const safeSeconds = Math.max(0, seconds);
+            const minutes = Math.floor(safeSeconds / 60);
+            const remainingSeconds = safeSeconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateSummaryStats() {
+            correctCountDisplay.textContent = correctAnswers;
+            incorrectCountDisplay.textContent = incorrectAnswers;
+            const accuracy = totalQuestions === 0 ? 0 : Math.round((correctAnswers / totalQuestions) * 100);
+            accuracyDisplay.textContent = `${accuracy}%`;
+        }
+
         // โหลดคำถาม
         function loadQuestion() {
+            updateProgress();
+
             // ถ้าคำถามหมด
             if (currentQuestionIndex >= questions.length) {
                 endGame();
@@ -484,11 +714,23 @@
             optionsContainer.innerHTML = "";
 
             // สร้างตัวเลือกใหม่
-            q.options.forEach(option => {
+            q.options.forEach((option, index) => {
                 const button = document.createElement('button');
-                button.className = "w-full text-left p-4 rounded-lg border-2 border-gray-200 bg-gray-50 hover:border-blue-500 hover:bg-blue-50 transition-all mb-3 shadow-sm";
-                button.innerHTML = `<span class="font-medium">${option.text}</span>`;
-                
+                button.className = "relative w-full overflow-hidden rounded-2xl border-2 border-transparent bg-white/90 text-left shadow-md transition-all duration-300 group hover:-translate-y-0.5 hover:shadow-xl";
+                button.innerHTML = `
+                    <span class="answer-overlay absolute inset-0 bg-gradient-to-r from-blue-50/0 to-cyan-50/0 transition-opacity duration-300"></span>
+                    <div class="relative flex items-start gap-4 p-5">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-cyan-100 text-blue-600 font-semibold flex items-center justify-center">${index + 1}</div>
+                        <div class="space-y-2">
+                            <p class="font-semibold text-gray-800 leading-relaxed group-hover:text-blue-600">${option.text}</p>
+                            <p class="answer-skill text-xs uppercase tracking-wide text-blue-400 font-semibold">${skillLabels[option.skill]}</p>
+                        </div>
+                    </div>
+                `;
+
+                button.dataset.answerText = option.text;
+                button.dataset.skill = option.skill;
+                button.dataset.correct = option.correct;
                 button.addEventListener('click', () => selectAnswer(button, option.correct, option.skill));
                 optionsContainer.appendChild(button);
             });
@@ -497,33 +739,61 @@
         // เลือกคำตอบ
         function selectAnswer(buttonEl, isCorrect, skill) {
             // ป้องกันการคลิกซ้ำ
-            optionsContainer.querySelectorAll('button').forEach(b => b.disabled = true);
+            optionsContainer.querySelectorAll('button').forEach(b => {
+                b.disabled = true;
+                b.classList.add('cursor-not-allowed');
+            });
 
             // --- ส่วนบันทึกคำตอบ (ใหม่) ---
             const q = questions[currentQuestionIndex];
-            // หา text จาก button.textContent (อาจมีปัญหาถ้า text ซ้ำ)
-            // ปรับปรุง: ใช้ text จาก object โดยตรง
-            const userAnswerText = q.options.find(opt => opt.text === buttonEl.textContent).text;
+            const userAnswerText = buttonEl.dataset.answerText;
             const correctAnswerText = q.options.find(opt => opt.correct).text;
-            
+
             userResults.push({
                 question: q.dialogue,
                 userAnswer: userAnswerText,
                 correctAnswer: correctAnswerText,
-                isCorrect: isCorrect
+                isCorrect: isCorrect,
+                skillKey: skill
             });
             // --- จบส่วนบันทึกคำตอบ ---
 
+            const overlay = buttonEl.querySelector('.answer-overlay');
             if (isCorrect) {
                 score += 10;
+                correctAnswers += 1;
                 skillScores[skill] += 1;
                 buttonEl.classList.add('feedback-correct');
+                buttonEl.classList.add('border-emerald-400', 'bg-emerald-50/70');
+                if (overlay) {
+                    overlay.classList.remove('from-blue-50/0', 'to-cyan-50/0');
+                    overlay.classList.add('from-emerald-100/80', 'to-teal-100/80', 'opacity-100');
+                }
             } else {
                 score -= 5; // หักคะแนนถ้าตอบผิด
+                incorrectAnswers += 1;
                 buttonEl.classList.add('feedback-incorrect');
+                buttonEl.classList.add('border-rose-300', 'bg-rose-50/80');
+                if (overlay) {
+                    overlay.classList.remove('from-blue-50/0', 'to-cyan-50/0');
+                    overlay.classList.add('from-rose-100/80', 'to-orange-100/80', 'opacity-100');
+                }
+
+                // แสดงคำตอบที่ถูกต้อง
+                optionsContainer.querySelectorAll('button').forEach(b => {
+                    if (b.dataset.correct === 'true') {
+                        b.classList.add('border-emerald-400', 'bg-emerald-50/70');
+                        const correctOverlay = b.querySelector('.answer-overlay');
+                        if (correctOverlay) {
+                            correctOverlay.classList.remove('from-blue-50/0', 'to-cyan-50/0');
+                            correctOverlay.classList.add('from-emerald-100/80', 'to-teal-100/80', 'opacity-100');
+                        }
+                    }
+                });
             }
-            
+
             scoreDisplay.textContent = score;
+            updateSummaryStats();
 
             // หน่วงเวลาเล็กน้อยเพื่อให้เห็น Feedback
             setTimeout(() => {
@@ -540,9 +810,14 @@
             screenGame.classList.add('hidden');
             screenResult.classList.remove('hidden');
 
+            updateProgress();
+            updateSummaryStats();
+
             // แสดงผล
             resultPlayerName.textContent = currentPlayer;
             finalScoreDisplay.textContent = score;
+            const timeSpent = totalDuration - timer;
+            timeSpentDisplay.textContent = formatTime(timeSpent);
 
             // ประเมินผล (ปรับเกณฑ์คะแนนสำหรับ 20 ข้อ)
             if (score >= 170) { // 85%
@@ -565,17 +840,30 @@
             reviewContainer.innerHTML = ""; // ล้างของเก่า
 
             userResults.forEach((result, index) => {
+                const statusIcon = result.isCorrect ? '✅' : '❌';
+                const statusColor = result.isCorrect ? 'text-emerald-600' : 'text-rose-600';
+                const borderColor = result.isCorrect ? 'border-blue-100' : 'border-rose-200';
+                const backgroundColor = result.isCorrect ? 'bg-white' : 'bg-rose-50';
+                const highlightBar = result.isCorrect ? 'bg-emerald-400' : 'bg-rose-400';
+
                 const resultHtml = `
-                    <div class="border border-gray-200 rounded-lg p-4 ${result.isCorrect ? 'bg-white' : 'bg-red-50'}">
-                        <p class="font-semibold text-gray-700 mb-2">ข้อ ${index + 1}: ${result.question}</p>
-                        <p class="text-sm ${result.isCorrect ? 'text-green-600' : 'text-red-600'}">
-                            <strong>คำตอบของคุณ:</strong> "${result.userAnswer}" ${result.isCorrect ? ' (✔ ถูกต้อง)' : ' (✖ ผิด)'}
-                        </p>
-                        ${!result.isCorrect ? `
-                            <p class="text-sm text-blue-600 mt-1">
-                                <strong>เฉลย:</strong> "${result.correctAnswer}"
+                    <div class="relative overflow-hidden rounded-2xl border ${borderColor} ${backgroundColor} p-5 shadow-sm">
+                        <span class="absolute inset-y-0 left-0 w-1.5 ${highlightBar}"></span>
+                        <div class="pl-4 space-y-2">
+                            <p class="flex items-center gap-3 text-base font-semibold text-gray-800">
+                                <span class="${statusColor} text-xl">${statusIcon}</span>
+                                <span>ข้อ ${index + 1}: ${result.question}</span>
                             </p>
-                        ` : ''}
+                            <p class="text-sm ${statusColor}">
+                                <strong>คำตอบของคุณ:</strong> “${result.userAnswer}” ${result.isCorrect ? '(ถูกต้อง)' : '(ผิด)'}
+                            </p>
+                            ${!result.isCorrect ? `
+                                <p class="text-sm text-blue-600">
+                                    <strong>เฉลยที่เหมาะสม:</strong> “${result.correctAnswer}”
+                                </p>
+                            ` : ''}
+                            <p class="text-xs uppercase tracking-wide text-blue-400 font-semibold">ทักษะที่ประเมิน: ${skillLabels[result.skillKey]}</p>
+                        </div>
                     </div>
                 `;
                 reviewContainer.innerHTML += resultHtml;
@@ -675,6 +963,13 @@
             screenResult.classList.add('hidden');
             screenStart.classList.remove('hidden');
             playerNameInput.value = ""; // ล้างชื่อ
+            downloadPdfButton.innerHTML = pdfButtonDefaultHtml;
+            downloadPdfButton.disabled = false;
+            restartButton.style.display = '';
+            downloadPdfButton.style.display = '';
+            activePlayerName.textContent = 'ผู้แทน';
+            questionCounter.textContent = `1 / ${totalQuestions}`;
+            progressBar.style.width = '0%';
         });
 
         // (ใหม่) PDF Download Listener
@@ -684,12 +979,13 @@
             const pdfElement = document.getElementById('screen-result');
 
             // Show loading state
-            downloadPdfButton.textContent = "กำลังสร้าง PDF... (อาจใช้เวลาสักครู่)";
+            downloadPdfButton.innerHTML = `
+                <span class="inline-flex items-center gap-2">
+                    <span class="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin"></span>
+                    กำลังสร้าง PDF...
+                </span>
+            `;
             downloadPdfButton.disabled = true;
-
-            // Temporarily hide buttons from the PDF capture
-            restartButton.style.display = 'none';
-            downloadPdfButton.style.display = 'none';
 
             html2canvas(pdfElement, {
                 scale: 2, // Increase resolution
@@ -697,10 +993,18 @@
                 onclone: (clonedDoc) => {
                     // This fixes a bug where the canvas chart doesn't render correctly in html2canvas
                     // We find the original chart object and replace the cloned canvas with a static image
+                    const clonedRestartButton = clonedDoc.getElementById('restartButton');
+                    const clonedDownloadButton = clonedDoc.getElementById('downloadPdfButton');
+                    if (clonedRestartButton) {
+                        clonedRestartButton.style.display = 'none';
+                    }
+                    if (clonedDownloadButton) {
+                        clonedDownloadButton.style.display = 'none';
+                    }
                     const clonedCanvas = clonedDoc.getElementById('skillChart');
                     if (clonedCanvas && chartInstance) {
                         // Get the static image data from the *original* chart object
-                        const dataUrl = chartInstance.toDataURL('image/png');
+                        const dataUrl = chartInstance.toBase64Image ? chartInstance.toBase64Image() : chartInstance.canvas.toDataURL('image/png');
                         const img = new Image();
                         img.src = dataUrl;
                         img.style.width = "100%"; // Maintain responsiveness
@@ -734,20 +1038,16 @@
                 doc.save(`TCP_Advisor_Hub_Results_${currentPlayer.replace(/ /g, '_')}.pdf`);
 
                 // Restore UI
-                downloadPdfButton.textContent = "ดาวน์โหลดผลลัพธ์ (PDF)";
+                downloadPdfButton.innerHTML = pdfButtonDefaultHtml;
                 downloadPdfButton.disabled = false;
-                restartButton.style.display = 'block';
-                downloadPdfButton.style.display = 'block';
 
             }).catch(err => {
                 console.error("Error generating PDF: ", err);
                 alert("เกิดข้อผิดพลาดในการสร้าง PDF");
-                
+
                 // Restore UI even on error
-                downloadPdfButton.textContent = "ดาวน์โหลดผลลัพธ์ (PDF)";
+                downloadPdfButton.innerHTML = pdfButtonDefaultHtml;
                 downloadPdfButton.disabled = false;
-                restartButton.style.display = 'block';
-                downloadPdfButton.style.display = 'block';
             });
         });
 
